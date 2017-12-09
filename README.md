@@ -20,7 +20,7 @@ generateConfig.xml中配置加入：
 			enableDeleteByExample="false" enableUpdateByExample="false">
 			<!-- 开启乐观锁字段，固定是int类型的version字段（如果是其他字段名或timestamp类型，请自行修改代码实现），每次update时候version加1 -->
 			<!-- 如果不设置或设为false，则version当做普通字段处理-->
-			<!-- version字段需要中db中设置一个默认值 -->
+			<!-- version字段需要中db中设置一个默认初始值，因为在insert的时候Java中是不设值的-->
 			<!-- 表中其他字段名不要含有version单词，如previousversion等 -->
 			<!-- 效果：生成的POJO中没有setVersion方法；insert的时候没有version字段，依赖db中的默认值；update的时候根据id和version做where条件，version自动加1 -->
 			<property name="enableOptimisticLock" value="true"/>
