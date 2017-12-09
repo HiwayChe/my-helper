@@ -24,8 +24,8 @@ generateConfig.xml中配置加入：
 			<!-- 表中其他字段名不要含有version单词，如previousversion等 -->
 			<!-- 效果：生成的POJO中没有setVersion方法；insert的时候没有version字段，依赖db中的默认值；update的时候根据id和version做where条件，version自动加1 -->
 			<property name="enableOptimisticLock" value="true"/>
-			<!-- 不需要从Java中传值的字段，多个字段之间用逗号分隔 -->
+			<!-- 不需要从Java中传值的字段，多个字段之间用逗号分隔，如create_time和update_time不是业务字段，不需要中java中设值 -->
 			<property name="columnsNotPassValueInJava" value="create_time,update_time"/>
-			<!-- identity=true生成的selectKey的order是after -->
+			<!-- identity=true生成的selectKey的order是after，对于自增id回设值 -->
 			<generatedKey column="id" sqlStatement="MySql" identity="true"/>
 		</table>
