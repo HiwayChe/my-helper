@@ -7,12 +7,13 @@ include Helper class and Mybatis-generator plugin.
 3、不生成数据库有默认值的字段，如create_time和update_time字段，这些字段不需要从java中传入
 
 中generateConfig.xml中配置加入：
-plugin type="com.my.helper.MybatisPaginationPlugin" ></plugin>
-		<plugin type="com.my.helper.MybatisOptimisticLockPlugin" ></plugin>
-		<plugin type="com.my.helper.MybatisNotPassValueInJavaPlugin"></plugin>
+```xml
+	<plugin type="com.my.helper.MybatisPaginationPlugin" ></plugin>
+	<plugin type="com.my.helper.MybatisOptimisticLockPlugin" ></plugin>
+	<plugin type="com.my.helper.MybatisNotPassValueInJavaPlugin"></plugin>
     
     
-    <table schema="my" tableName="user" enableCountByExample="true" enableSelectByExample="true"
+    	<table schema="my" tableName="user" enableCountByExample="true" enableSelectByExample="true"
 			enableDeleteByExample="false" enableUpdateByExample="false">
 			<!-- 开启乐观锁字段，固定是int类型的version字段（如果是其他字段名或timestamp类型，请自行修改代码实现），每次update时候version加1 -->
 			<!-- 如果不设置或设为false，则version当做普通字段处理-->
