@@ -2,12 +2,14 @@
 helper project
 include Helper class and Mybatis-generator plugin.
 插件：
-1.分页，限制offset和rows的大小
-2.自动生成支持乐观锁(version字段)的mapper.xml，pojo中不生成对应的setVersion方法
-3.不生成数据库有默认值的字段，如create_time和update_time字段，这些字段不需要从java中传入
+
+1. 分页，限制offset和rows的大小
+2. 自动生成支持乐观锁(version字段)的mapper.xml，pojo中不生成对应的setVersion方法
+3. 不生成数据库有默认值的字段，如create\_time和update\_time字段，这些字段不需要从java中传入
 
 ----
-中generateConfig.xml中配置加入：
+generateConfig.xml中配置加入：
+
 ```xml
 	<plugin type="com.my.helper.MybatisPaginationPlugin" ></plugin>
 	<plugin type="com.my.helper.MybatisOptimisticLockPlugin" ></plugin>
