@@ -14,21 +14,33 @@ import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.logging.Log;
+import org.mybatis.generator.logging.LogFactory;
+
 public class MybatisPaginationPlugin extends PluginAdapter {
+
+	private final int max_offset = 1000;// 在分页的时候最大允许offst 1000条，再大的话请走搜索
+	private final int max_rows = 200;// 在分页的时候每页最多取200条
+
+	private Log log = LogFactory.getLog(getClass());
+
 	@Override
 	public boolean modelExampleClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
 		addLimit(topLevelClass, introspectedTable, "offset");
 		addLimit(topLevelClass, introspectedTable, "rows");
 		return super.modelExampleClassGenerated(topLevelClass, introspectedTable);
 	}
+
 	@Override
-	public boolean sqlMapSelectByExampleWithoutBLOBsElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
+	public boolean sqlMapSelectByExampleWithoutBLOBsElementGenerated(XmlElement element,
+			IntrospectedTable introspectedTable) {
 		XmlElement isNotNullElement = new XmlElement("if");
 		isNotNullElement.addAttribute(new Attribute("test", "offset >= 0"));
 		isNotNullElement.addElement(new TextElement(" limit ${offset} , ${rows}"));
 		element.addElement(isNotNullElement);
 		return super.sqlMapUpdateByExampleWithoutBLOBsElementGenerated(element, introspectedTable);
 	}
+
 	private void addLimit(TopLevelClass topLevelClass, IntrospectedTable introspectedTable, String name) {
 		CommentGenerator commentGenerator = context.getCommentGenerator();
 		Field field = new Field();
@@ -44,7 +56,26 @@ public class MybatisPaginationPlugin extends PluginAdapter {
 		method.setVisibility(JavaVisibility.PUBLIC);
 		method.setName("set" + camel);
 		method.addParameter(new Parameter(FullyQualifiedJavaType.getIntInstance(), name));
-		method.addBodyLine("this." + name + "=" + name + ";");
+		// method.addBodyLine("this." + name + "=" + name + ";");
+		StringBuilder sb = new StringBuilder(200);
+		if ("offset".equals(name)) {
+			sb.append("if(").append(name).append(" > ").append(this.max_offset).append("){")
+					.append(System.lineSeparator())
+					.append("\t\t\tthrow new UnsupportedOperationException(\"offset is too big, must less than ")
+					.append(this.max_offset).append("\");").append(System.lineSeparator()).append("\t\t}")
+					.append(System.lineSeparator()).append("\t\tthis.").append(name).append("=").append(name)
+					.append(";");
+			this.log.debug("增加分页功能，offset最大值限定为" + this.max_offset);
+		} else if ("rows".equals(name)) {
+			sb.append("if(").append(name).append(" > ").append(this.max_rows).append("){")
+					.append(System.lineSeparator())
+					.append("\t\t\tthrow new UnsupportedOperationException(\"too many rows to query, must less than ")
+					.append(this.max_rows).append("\");").append(System.lineSeparator()).append("\t\t}")
+					.append(System.lineSeparator()).append("\t\tthis.").append(name).append("=").append(name)
+					.append(";");
+			this.log.debug("增加分页功能，每次查询最多限定为" + this.max_rows);
+		}
+		method.addBodyLine(sb.toString());
 		commentGenerator.addGeneralMethodComment(method, introspectedTable);
 		topLevelClass.addMethod(method);
 		method = new Method();
@@ -55,8 +86,10 @@ public class MybatisPaginationPlugin extends PluginAdapter {
 		commentGenerator.addGeneralMethodComment(method, introspectedTable);
 		topLevelClass.addMethod(method);
 	}
+
 	@Override
 	public boolean validate(List<String> warnings) {
 		return true;
 	}
+
 }
